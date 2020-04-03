@@ -1,0 +1,53 @@
+yum install -y kubelet-1.16.0 kubeadm-1.16.0 kubectl-1.16.0
+
+/proc/sys/net/bridge/bridge-nf-call-iptables contents are not set to 1
+
+detected "cgroupfs" as the Docker cgroup driver. The recommended driver is "systemd"
+
+running with swap on is not supported. Please disable swap
+https://blog.csdn.net/qq_24058757/article/details/86600736
+
+//不好用
+kubeadm init --kubernetes-version=v1.16.0 --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=192.168.50.139 --ignore-preflight-errors=Swap
+--image-repository registry.aliyuncs.com/google_containers
+
+kubeadm init --config=config.yaml
+
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+
+
+kubeadm token list 查看token
+kubeadm token create 创建token
+查看sha256值
+openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+
+
+# kubernetes reset
+重启后要重新关闭swap
+iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X
+sysctl net.bridge.bridge-nf-call-iptables=1
+sudo ip link del cni0
+sudo ip link del flannel.1
+
+
+如果要在 node 节点使用 kubectl,需要把 master 节点 /etc/kubernetes/admin.conf 复制到 node:~/.kube/config
+sudo scp /etc/kubernetes/admin.conf qiyuanfeng@172.17.172.231:~/.kube/config
+
+# 让 master 也作为 node 工作
+kubectl taint nodes --all node-role.kubernetes.io/master-
+
+# 安装网络插件
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+# 查看状态
+kubectl get pods --all-namespaces
+# 查看某个 pod 状态错误
+kubectl --namespace=kube-system describe pod weave-net-kjflw
+
+
+kubeadm join 172.17.172.226:6443 --token q3084g.vfp0xytcu0h9caxg \
+    --discovery-token-ca-cert-hash sha256:d651b606e7592eebceb2e298749ee2196201f878452cf27fce5d408afa673c10

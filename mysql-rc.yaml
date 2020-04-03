@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: mysql                           # RC 全局唯一名称
+spec:
+  replicas: 1                           # pod 副本期待数量
+  selector:
+    app: mysql                          # 符合目标的 pod 拥有此标签
+  template:                             # pod 模板
+    metadata:
+      labels:
+        app: mysql                      # pod 副本拥有的标签，对应 RC 的 selector
+    spec:
+      containers:
+      - name: mysql
+        image: mysql                    # 容器对应的 Docker image
+        ports:
+        - containerPort: 3306           # 容器应用监听端口号
+        env:                            # 注入容器内的环境变量
+        - name: MYSQL_ROOT_PASSWORD
+          value: "123456"

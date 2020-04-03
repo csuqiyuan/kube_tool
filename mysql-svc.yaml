@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql         # Service 全局唯一名称
+spec:
+  ports:
+    - port: 3306      # 提供服务的端口号
+  selector:           # 对应的 pod 拥有这里定义的标签
+    app: mysql

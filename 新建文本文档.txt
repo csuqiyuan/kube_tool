@@ -51,3 +51,6 @@ kubectl --namespace=kube-system describe pod weave-net-kjflw
 
 kubeadm join 172.17.172.226:6443 --token q3084g.vfp0xytcu0h9caxg \
     --discovery-token-ca-cert-hash sha256:d651b606e7592eebceb2e298749ee2196201f878452cf27fce5d408afa673c10
+
+
+1、在创建master后随时把token和sha256存到数据库

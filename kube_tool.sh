@@ -35,6 +35,7 @@ function install_docker(){
 
 function set_env(){
 	# root user
+	yum install java-1.8.0-openjdk -y
 	systemctl disable firewalld
 	systemctl stop firewalld
 	setenforce 0

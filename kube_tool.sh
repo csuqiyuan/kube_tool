@@ -1,17 +1,16 @@
 #!/bin/bash
 
-# 临时参数，最终是由外部传入，通过平台配置中心
-private_repo_path=172.18.37.12:5000
-
 function help(){
 	cat << HELP
-	NAME：dis - display the gived className or methodName  
-	USAGE:dis [-c className] [-c] [-m methodName] [-m] [-n num] [-h ]
+	USAGE:./kube_tool.sh 
 	Options:
-		-f 
-		-m
-		-n
-		-r
+		-m install kubernetes master node
+		-n install kuberentes node node
+		-c copy config file
+		-s scp config file
+		-p install net plugin
+		-r create new token and update token/sha256
+		-t save token and sha256
 	NOTE:can not use -c and -m at the same time!
 HELP
 }
@@ -55,7 +54,7 @@ function set_env(){
 }
 
 function download_images_from_private(){
-	DOCKER_REPO_USER=172.17.172.226:5000
+	DOCKER_REPO_USER=$1
 	KUBE_VERSION=v1.16.0
 	ETCD_VERSION=3.3.15-0
 	PAUSE_VERSION=3.1
@@ -139,7 +138,7 @@ function install_kubeadm(){
 	# version 1.16.0
 	yum install -y kubelet-1.16.0 kubeadm-1.16.0 kubectl-1.16.0 --disableexcludes=kubernetes
 	systemctl enable kubelet && systemctl start kubelet
-	download_images_from_private
+	download_images_from_private $1
 	swapoff -a
 	# /proc/sys/net/bridge/bridge-nf-call-iptables contents are not set to 1
 	echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
@@ -149,7 +148,7 @@ function install_kubeadm(){
 
 function install_kubernetes(){
 	set_env $1
-	install_kubeadm
+	install_kubeadm $1
 }
 
 # -m 
@@ -187,7 +186,7 @@ function cp_config(){
 	sudo cp -i /etc/kubernetes/admin.conf ${HOME}/.kube/config
 	sudo chown $(id -u):$(id -g) ${HOME}/.kube/config
 }
-# -s 未完，要调用对应java包
+# -s
 function scp_config(){
 	OLD_IFS="$IFS" 
 	IFS="," 
@@ -205,44 +204,45 @@ function net_plugin(){
 }
 # -r
 function create_and_post_token(){
-	callback=$1
 	kubeadm token create
-	token_and_sha ${callback}
+	token_and_sha $1
 }
 # -t
 function token_and_sha(){
-	callback=$1
 	token=$(kubeadm token list | awk -F" " '{print $1}' |tail -n 1)
 	sha256=$(openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //')
-	curl ${callback}/apis/callback/token -X POST --data-urlencode token=${token} --data-urlencode sha=${sha256}
+	curl $1/apis/callback/token -X POST --data-urlencode token=${token} --data-urlencode sha=${sha256}
 }
 
-function test(){
-	OLD_IFS="$IFS" 
-	IFS="," 
-	arr=($1) 
-	IFS="$OLD_IFS" 
-	echo ${arr[0]}
-	echo ${arr[1]}
-	echo ${arr[2]}
-}
-while getopts "a:bcs:" opt; do
+while getopts "m:n:cs:pr:t:" opt; do
 	case $opt in
-		a)
-		echo "this is -a the arg is ! $OPTARG" 
-		test $OPTARG
+		m)
+		echo "this is -m the arg is ! $OPTARG" 
+		master $OPTARG
 		;;
-		b)
-		echo "this is -b the arg is ! $OPTARG" 
-		test $OPTARG
+		n)
+		echo "this is -n the arg is ! $OPTARG" 
+		node $OPTARG
 		;;
 		c)
-		echo "this is -c the arg is ! $OPTARG" 
-		test $OPTARG
+		echo "this is -c" 
+		cp_config
 		;;
 		s)
-		echo "this is -c the arg is ! $OPTARG" 
+		echo "this is -s the arg is ! $OPTARG" 
 		scp_config $OPTARG
+		;;
+		p)
+		echo "this is -p" 
+		net_plugin
+		;;
+		r)
+		echo "this is -r the arg is ! $OPTARG" 
+		create_and_post_token $OPTARG
+		;;
+		t)
+		echo "this is -t the arg is ! $OPTARG" 
+		token_and_sha $OPTARG
 		;;
 		\?)
 		help

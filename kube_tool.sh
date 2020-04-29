@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 function help(){
 	cat << HELP
 	USAGE:./kube_tool.sh 

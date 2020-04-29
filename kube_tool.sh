@@ -194,9 +194,10 @@ function scp_config(){
 	arr=($1) 
 	IFS="$OLD_IFS" 
 	NODE_IP=${arr[0]}
-	NODE_USERNAME=${arr[1]}
-	NODE_PASSWORD=${arr[2]}
-	java -jar ./connect.jar ${NODE_IP} ${NODE_USERNAME} ${NODE_PASSWORD}
+	PORT=${arr[1]}
+	NODE_USERNAME=${arr[2]}
+	NODE_PASSWORD=${arr[3]}
+	java -jar ./connect.jar ${NODE_IP} ${PORT} ${NODE_USERNAME} ${NODE_PASSWORD}
 }
 # -p
 function net_plugin(){

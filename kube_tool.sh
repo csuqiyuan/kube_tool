@@ -183,16 +183,11 @@ function node(){
 }
 # -c
 function cp_config(){
-	OLD_IFS="$IFS" 
-	IFS="," 
-	arr=($1) 
-	IFS="$OLD_IFS" 
-	set -x
-	echo ${arr[1]} | sudo rm -rf /home/${arr[0]}/.kube
+	echo $1 | sudo rm -rf ~/.kube
 	# 复制配置文件
-	mkdir -p /home/${arr[0]}/.kube
-	echo ${arr[1]} | sudo -S cp -i /etc/kubernetes/admin.conf /home/${arr[0]}/.kube/config
-	echo ${arr[1]} | sudo -S chown $(id -u):$(id -g) /home/${arr[0]}/.kube/config
+	mkdir -p ~/.kube
+	echo $1 | sudo -S cp -i /etc/kubernetes/admin.conf ~/.kube/config
+	echo $1 | sudo -S chown $(id -u):$(id -g) ~/.kube/config
 }
 # -s
 function scp_config(){

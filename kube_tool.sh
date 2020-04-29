@@ -181,7 +181,7 @@ function node(){
 }
 # -c
 function cp_config(){
-	echo $1 | sudo rm -rf ~/.kube
+	rm -rf ~/.kube
 	# 复制配置文件
 	mkdir -p ~/.kube
 	echo $1 | sudo -S cp -i /etc/kubernetes/admin.conf ~/.kube/config

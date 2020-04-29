@@ -22,7 +22,7 @@ public class ConnectUtil {
 
                 //可以用于两个机器间传文件
                 SCPClient clt = conn.createSCPClient();
-                clt.put("/etc/kubernetes/admin.conf", "/etc/kubernetes");
+                clt.put("/etc/kubernetes/admin.conf", "/etc/kubernetes/admin.conf");
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());

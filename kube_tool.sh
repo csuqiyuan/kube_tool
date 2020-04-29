@@ -184,6 +184,7 @@ function node(){
 # -c
 function cp_config(){
 	set -x
+	rm -rf /home/$1/.kube
 	# 复制配置文件
 	mkdir -p /home/$1/.kube
 	cp -i /etc/kubernetes/admin.conf /home/$1/.kube/config

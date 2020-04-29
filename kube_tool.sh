@@ -183,6 +183,7 @@ function node(){
 }
 # -c
 function cp_config(){
+	set -x
 	# 复制配置文件
 	mkdir -p ${HOME}/.kube
 	sudo cp -i /etc/kubernetes/admin.conf ${HOME}/.kube/config
@@ -211,6 +212,7 @@ function create_and_post_token(){
 }
 # -t
 function token_and_sha(){
+	set -x
 	token=$(kubeadm token list | awk -F" " '{print $1}' |tail -n 1)
 	sha256=$(openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //')
 	curl $1/apis/callback/token -X POST --data-urlencode token=${token} --data-urlencode sha=${sha256}

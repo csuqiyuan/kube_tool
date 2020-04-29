@@ -185,9 +185,9 @@ function node(){
 function cp_config(){
 	set -x
 	# 复制配置文件
-	mkdir -p ${HOME}/.kube
-	sudo cp -i /etc/kubernetes/admin.conf ${HOME}/.kube/config
-	sudo chown $(id -u):$(id -g) ${HOME}/.kube/config
+	mkdir -p /home/$1/.kube
+	cp -i /etc/kubernetes/admin.conf /home/$1/.kube/config
+	chown $(id -u):$(id -g) /home/$1/.kube/config
 }
 # -s
 function scp_config(){
@@ -218,7 +218,7 @@ function token_and_sha(){
 	curl $1/apis/callback/token -X POST --data-urlencode token=${token} --data-urlencode sha=${sha256}
 }
 
-while getopts "m:n:cs:pr:t:" opt; do
+while getopts "m:n:c:s:pr:t:" opt; do
 	case $opt in
 		m)
 		echo "this is -m the arg is ! $OPTARG" 
@@ -229,8 +229,8 @@ while getopts "m:n:cs:pr:t:" opt; do
 		node $OPTARG
 		;;
 		c)
-		echo "this is -c" 
-		cp_config
+		echo "this is -c the arg is ! $OPTARG" 
+		cp_config $OPTARG
 		;;
 		s)
 		echo "this is -s the arg is ! $OPTARG" 

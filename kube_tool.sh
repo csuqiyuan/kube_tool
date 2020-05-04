@@ -11,6 +11,7 @@ function help(){
 		-p install net plugin
 		-r create new token and update token/sha256
 		-t save token and sha256
+		-u kubeadm reset
 	NOTE:can not use -c and -m at the same time!
 HELP
 }
@@ -191,6 +192,8 @@ function cp_config(){
 	mkdir -p ~/.kube
 	echo $1 | sudo -S cp -i /etc/kubernetes/admin.conf ~/.kube/config
 	echo $1 | sudo -S chown $(id -u):$(id -g) ~/.kube/config
+
+	kubectl create clusterrolebinding test:anonymous --clusterrole=cluster-admin --user=system:anonymous
 }
 # -s
 function scp_config(){

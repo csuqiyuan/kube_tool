@@ -179,6 +179,11 @@ function node(){
     	--discovery-token-ca-cert-hash sha256:${SHA256} \
     	--ignore-preflight-errors=Swap
 }
+# -u
+function uninstall(){
+	echo y | kubeadm reset
+}
+
 # -c
 function cp_config(){
 	rm -rf ~/.kube
@@ -217,7 +222,7 @@ function token_and_sha(){
 	curl $1/apis/callback/token -X POST --data-urlencode token=${token} --data-urlencode sha=${sha256}
 }
 
-while getopts "m:n:c:s:pr:t:" opt; do
+while getopts "m:n:c:s:pr:t:u" opt; do
 	case $opt in
 		m)
 		echo "this is -m the arg is ! $OPTARG" 
@@ -246,6 +251,10 @@ while getopts "m:n:c:s:pr:t:" opt; do
 		t)
 		echo "this is -t the arg is ! $OPTARG" 
 		token_and_sha $OPTARG
+		;;
+		u)
+		echo "this is -u" 
+		uninstall
 		;;
 		\?)
 		help
